@@ -2,7 +2,41 @@
 document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.getElementById('toggleBtn');
     const status = document.getElementById('status');
+    const rowLengthInput = document.getElementById('rowLength');
+
     let botActive = false;
+
+    // Загружаем сохраненные настройки
+    chrome.storage.sync.get(['rowLength'], function (result) {
+        if (result.rowLength) {
+            rowLengthInput.value = result.rowLength;
+        }
+    });
+
+    // Сохраняем настройки при изменении и обновляем бота в реальном времени
+    rowLengthInput.addEventListener('change', function () {
+        const newRowLength = parseInt(rowLengthInput.value);
+        chrome.storage.sync.set({
+            rowLength: newRowLength
+        });
+
+        // Обновляем настройки работающего бота
+        if (botActive) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                chrome.scripting.executeScript({
+                    target: { tabId: tabs[0].id },
+                    func: updateBotSettings,
+                    args: [{ rowLength: newRowLength }]
+                }, function (results) {
+                    // Визуальная обратная связь
+                    rowLengthInput.classList.add('updated');
+                    setTimeout(() => {
+                        rowLengthInput.classList.remove('updated');
+                    }, 500);
+                });
+            });
+        }
+    });
 
     // Проверяем статус бота при открытии popup
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -19,11 +53,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Обработчик единственной кнопки
     toggleBtn.addEventListener('click', function () {
         if (!botActive) {
-            // Запускаем бота
+            // Сохраняем настройки
+            const settings = {
+                rowLength: parseInt(rowLengthInput.value)
+            };
+            chrome.storage.sync.set(settings);
+
+            // Запускаем бота с настройками
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 chrome.scripting.executeScript({
                     target: { tabId: tabs[0].id },
-                    func: startSnakeBot
+                    func: startSnakeBot,
+                    args: [settings]
                 });
                 updateStatus(true);
             });
@@ -58,19 +99,19 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Функция запуска бота (копия instant_response_bot)
-function startSnakeBot() {
+function startSnakeBot(settings = {}) {
     // Проверяем, не запущен ли уже
     if (window.instantBot && window.instantBot.active) {
         console.log('🐍 Snake Bot уже запущен!');
         return;
     }
 
-    // Создаем бота
+    // Создаем бота с настройками
     const InstantResponseBot = {
         active: false,
         direction: 'right',
         moves: 0,
-        rowLength: 12,
+        rowLength: settings.rowLength || 12,
 
         instantPress(key) {
             document.dispatchEvent(new KeyboardEvent('keydown', {
@@ -118,7 +159,7 @@ function startSnakeBot() {
             this.direction = 'right';
             this.moves = 0;
 
-            console.log('🚀 Snake Bot запущен!');
+            console.log('🚀 Snake Bot запущен! Шагов в строке:', this.rowLength);
 
             this.gameTimer = setInterval(() => {
                 if (this.active) {
@@ -153,4 +194,17 @@ function checkBotStatus() {
         return { active: window.instantBot.active };
     }
     return { active: false };
+}
+
+// Функция обновления настроек работающего бота
+function updateBotSettings(settings) {
+    if (window.instantBot && window.instantBot.active) {
+        // Обновляем настройки на лету
+        if (settings.rowLength !== undefined) {
+            window.instantBot.rowLength = settings.rowLength;
+            console.log('⚙️ Обновлено: Шагов в строке =', settings.rowLength);
+        }
+        return { success: true, message: 'Настройки обновлены' };
+    }
+    return { success: false, message: 'Бот не активен' };
 }
