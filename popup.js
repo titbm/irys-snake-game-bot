@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         botActive = active;
 
         if (active) {
-            status.textContent = '� Боот активен';
+            status.textContent = '� Бот активен';
             status.className = 'status active';
             toggleBtn.textContent = '⏹️ Остановить бота';
             toggleBtn.className = 'button stop-btn';
