@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 250px;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .button {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background: linear-gradient(45deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .stop-btn {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+        }
+        
+        .stop-btn:hover {
+            background: linear-gradient(45deg, #da190b, #c1170a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .status.inactive {
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+        
+        .status.active {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="emoji">🐍</span>
+        <h1>Snake Bot</h1>
+    </div>
+    
+    <div class="controls">
+        <button id="toggleBtn" class="button start-btn">🚀 Запустить бота</button>
+    </div>
+    
+    <div id="status" class="status inactive">
+        🔴 Бот неактивен
+    </div>
+    
+    <div class="footer">
+        Мгновенная реакция
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
