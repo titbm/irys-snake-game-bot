@@ -4,6 +4,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const status = document.getElementById('status');
     let botActive = false;
 
+    // Проверяем статус бота при открытии popup
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            func: checkBotStatus
+        }, function (results) {
+            if (results && results[0] && results[0].result) {
+                updateStatus(results[0].result.active);
+            }
+        });
+    });
+
     // Обработчик единственной кнопки
     toggleBtn.addEventListener('click', function () {
         if (!botActive) {
@@ -133,4 +145,12 @@ function stopSnakeBot() {
     if (window.instantBot) {
         window.instantBot.stop();
     }
+}
+
+// Функция проверки статуса бота
+function checkBotStatus() {
+    if (window.instantBot) {
+        return { active: window.instantBot.active };
+    }
+    return { active: false };
 }
